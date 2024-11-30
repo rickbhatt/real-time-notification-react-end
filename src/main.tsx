@@ -6,10 +6,15 @@ import Login from "./Login.tsx";
 import { createBrowserRouter, RouterProvider } from "react-router-dom";
 import AuthProvider from "@/contexts/AuthProvider.tsx";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
+import ProtectedRoutes from "./route-actions/ProtectedRoutes.tsx";
 
 const router = createBrowserRouter([
   {
-    element: <Dashboard />,
+    element: (
+      <ProtectedRoutes>
+        <Dashboard />
+      </ProtectedRoutes>
+    ),
     path: "/",
     index: true,
   },
