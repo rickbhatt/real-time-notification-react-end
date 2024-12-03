@@ -1,31 +1,57 @@
+import { Badge } from "@/components/ui/badge";
+import { useQuery } from "@tanstack/react-query";
+import { BellIcon } from "lucide-react";
 import { useState } from "react";
+import {
+  getUnreadNotification,
+  markNotificationAsRead,
+} from "./apis/notifications";
+import { Button } from "./components/ui/button";
 import {
   DropdownMenu,
   DropdownMenuContent,
   DropdownMenuItem,
   DropdownMenuTrigger,
 } from "./components/ui/dropdown-menu";
-import { BellIcon } from "lucide-react";
-import { Button } from "./components/ui/button";
-import { useQuery, useQueryClient } from "@tanstack/react-query";
-import {
-  getUnreadNotification,
-  markNotificationAsRead,
-} from "./apis/notifications";
-import { Badge } from "@/components/ui/badge";
+import useWebSocket from "react-use-websocket";
+
+interface Notification {
+  id: string;
+  title: string;
+  message: string;
+  status: string;
+  created_at: string;
+}
 
 const Dashboard = () => {
-  const [notifications, setNotifications] = useState([]);
+  const [notifications, setNotifications] = useState<Notification[]>([]);
   const [open, setOpen] = useState(false);
 
-  const queryClient = useQueryClient();
+  const WEBSOCKET_URL = `ws://127.0.0.1:8000/ws/notifications/`;
 
-  const getNotifications = useQuery({
+  useWebSocket(WEBSOCKET_URL, {
+    onOpen: () => {
+      console.log("websocket connected to notifications");
+    },
+    onClose: () => {
+      console.log("websocket closed");
+    },
+    onError: (error) => {
+      console.error("WebSocket error:", error);
+    },
+    onMessage: (event) => {
+      let notificationMessage = JSON.parse(event.data);
+
+      setNotifications((prev) => [notificationMessage, ...prev]);
+    },
+  });
+
+  useQuery({
     queryKey: ["notifications"],
     queryFn: async () => {
       try {
         let response = await getUnreadNotification();
-
+        console.log(response.data);
         setNotifications(response.data);
         return response.data;
       } catch (error: any) {
@@ -38,7 +64,7 @@ const Dashboard = () => {
   const handleMarkNotificationAsRead = async () => {
     console.log("marking notification as read");
     try {
-      let response = await markNotificationAsRead();
+      await markNotificationAsRead();
     } catch (error: any) {
       console.log("🚀 ~ handleMarkNotificationAsRead: ~ error:", error);
     }
