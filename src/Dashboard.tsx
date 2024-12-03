@@ -71,14 +71,13 @@ const Dashboard = () => {
   };
 
   return (
-    <div className="flex items-center justify-center h-screen w-screen">
+    <div className="flex flex-col items-center justify-center h-screen w-screen">
       <DropdownMenu
         open={open}
         onOpenChange={(isOpen) => {
           setOpen(isOpen);
           console.log(isOpen);
           if (isOpen) {
-            console.log("button is clicked");
             handleMarkNotificationAsRead();
           } else {
             setNotifications([]);
