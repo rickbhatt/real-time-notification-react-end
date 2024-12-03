@@ -3,6 +3,7 @@ import { Navigate, useLocation } from "react-router";
 import { useAuth } from "../contexts/AuthProvider";
 
 const ProtectedRoutes = ({ children }: PropsWithChildren) => {
+  console.log("protected routes being called");
   /* PROTECTS THE ROUTES ON THE BASIS OF LOGGED IN STATE */
 
   const { isLoggedIn, isLoading: authLoading } = useAuth();

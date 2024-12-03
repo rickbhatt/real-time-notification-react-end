@@ -41,9 +41,12 @@ interface AuthContextType {
   isLoading: boolean;
   error: Error | null;
   user: User | undefined;
-  refetchAuthStatus: () => Promise<void>;
-  login: (email: string, password: string) => Promise<LoginResponse>;
-  logout: () => Promise<LogoutResponse>;
+  refetchAuthStatus: () => void;
+  login: (
+    email: string,
+    password: string
+  ) => Promise<AxiosResponse<LoginResponse>>;
+  logout: () => Promise<AxiosResponse<LogoutSuccessResponse>>;
 }
 const AuthContext = createContext<AuthContextType | undefined>(undefined);
 
@@ -60,7 +63,6 @@ const AuthProvider = ({ children }: AuthProviderProps) => {
   const { isLoading, error, refetch } = useQuery({
     queryKey: ["loggedInStatus"],
     queryFn: async () => {
-      console.log("checkedLoggedInStatus running");
       try {
         // check logged in status
 
@@ -84,12 +86,10 @@ const AuthProvider = ({ children }: AuthProviderProps) => {
 
   const login = async (email: string, password: string) => {
     try {
-      let response: AxiosResponse<LoginSuccessResponse> = await handleLoginApi(
-        email,
-        password
-      );
+      let response = await handleLoginApi(email, password);
       setUser(response.data.user);
-      return response.data;
+      setIsLoggedIn(true);
+      return response;
     } catch (error) {
       throw error;
     }
@@ -97,8 +97,7 @@ const AuthProvider = ({ children }: AuthProviderProps) => {
 
   const logout = async () => {
     try {
-      let response: AxiosResponse<LogoutSuccessResponse> =
-        await handleLogoutApi();
+      let response = await handleLogoutApi();
 
       setUser(undefined);
       setIsLoggedIn(false);
