@@ -51,7 +51,7 @@ const Dashboard = () => {
     queryFn: async () => {
       try {
         let response = await getUnreadNotification();
-        console.log(response.data);
+
         setNotifications(response.data);
         return response.data;
       } catch (error: any) {
@@ -62,7 +62,6 @@ const Dashboard = () => {
   });
 
   const handleMarkNotificationAsRead = async () => {
-    console.log("marking notification as read");
     try {
       await markNotificationAsRead();
     } catch (error: any) {
@@ -76,7 +75,7 @@ const Dashboard = () => {
         open={open}
         onOpenChange={(isOpen) => {
           setOpen(isOpen);
-          console.log(isOpen);
+
           if (isOpen) {
             handleMarkNotificationAsRead();
           } else {
